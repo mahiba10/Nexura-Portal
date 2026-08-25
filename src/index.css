@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply font-body bg-surface text-white antialiased;
+    background-image:
+      radial-gradient(circle at 12% -8%, rgba(124, 58, 237, 0.14), transparent 40%),
+      radial-gradient(circle at 100% 0%, rgba(192, 38, 211, 0.09), transparent 35%);
+    background-attachment: fixed;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+  *:focus-visible {
+    outline: 2px solid #7C3AED;
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-white/[0.06] backdrop-blur-xl border border-white/10;
+  }
+  .glass-light {
+    @apply bg-white/70 backdrop-blur-xl border border-white/60 shadow-glass;
+  }
+  .card {
+    @apply bg-nexura-900/60 backdrop-blur-xl rounded-xl2 border border-white/10 shadow-card transition-colors duration-200;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-cta-gradient text-white font-semibold px-5 py-2.5 shadow-glow-purple hover:brightness-110 active:scale-[0.98] transition-all duration-150 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-white/5 border border-white/15 text-white font-semibold px-5 py-2.5 hover:bg-white/10 hover:border-white/25 active:scale-[0.98] transition-all duration-150;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl text-nexura-200 font-medium px-4 py-2 hover:bg-white/5 hover:text-white transition-all duration-150;
+  }
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-danger text-white font-semibold px-5 py-2.5 hover:brightness-110 active:scale-[0.98] transition-all duration-150;
+  }
+  .input-field {
+    @apply w-full rounded-lg border border-white/15 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder:text-nexura-400/70 focus:border-nexura-400 focus:ring-2 focus:ring-nexura-400/20 outline-none transition-all;
+  }
+  .label-text {
+    @apply block text-sm font-medium text-nexura-200 mb-1.5;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2.4s ease-in-out infinite;
+}
+
+@keyframes flow {
+  0% { stroke-dashoffset: 24; }
+  100% { stroke-dashoffset: 0; }
+}
+.animate-flow {
+  animation: flow 1s linear infinite;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #C7A8FA; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: #9F67F5; }

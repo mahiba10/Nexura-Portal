@@ -23,18 +23,18 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-nexura-950 text-white overflow-x-hidden">
       {/* Nav */}
-      <header className="relative z-10 max-w-7xl mx-auto flex items-center justify-between px-6 py-6">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-lg bg-cta-gradient flex items-center justify-center shadow-glow-purple">
-            <Zap className="w-5 h-5 text-white" fill="white" />
+      <header className="relative z-10 max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-5 sm:py-6 gap-3">
+        <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-cta-gradient flex items-center justify-center shadow-glow-purple shrink-0">
+            <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="white" />
           </div>
-          <span className="font-display font-extrabold text-lg tracking-wide">NEXURA</span>
+          <span className="font-display font-extrabold text-base sm:text-lg tracking-wide truncate">NEXURA</span>
         </div>
-        <nav className="flex items-center gap-3">
-          <Link to="/login" className="text-sm font-medium text-nexura-200 hover:text-white px-4 py-2 transition-colors">
+        <nav className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          <Link to="/login" className="text-sm font-medium text-nexura-200 hover:text-white px-2.5 sm:px-4 py-2 transition-colors whitespace-nowrap">
             Log in
           </Link>
-          <Link to="/signup" className="btn-primary text-sm px-4 py-2">
+          <Link to="/signup" className="btn-primary text-sm px-3.5 sm:px-4 py-2 whitespace-nowrap">
             Join Nexura
           </Link>
         </nav>
@@ -42,19 +42,19 @@ export default function Landing() {
 
       {/* Hero */}
       <section className="relative bg-nexura-radial">
-        <div className="max-w-7xl mx-auto px-6 pt-16 pb-24 grid lg:grid-cols-2 gap-14 items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-10 sm:pt-16 pb-16 sm:pb-24 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
           <div>
             <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-wide uppercase text-nexura-300 bg-white/5 border border-white/10 rounded-full px-3 py-1.5 mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-glow" />
               For Nexura members & coordinators
             </span>
-            <h1 className="font-display text-4xl sm:text-5xl font-extrabold leading-[1.08] tracking-tight">
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold leading-[1.12] sm:leading-[1.08] tracking-tight">
               Where tasks move from
               <span className="bg-gradient-to-r from-nexura-300 to-accent-pink bg-clip-text text-transparent"> assigned </span>
               to
               <span className="bg-gradient-to-r from-accent-pink to-nexura-300 bg-clip-text text-transparent"> approved.</span>
             </h1>
-            <p className="mt-6 text-lg text-nexura-200 max-w-lg leading-relaxed">
+            <p className="mt-6 text-base sm:text-lg text-nexura-200 max-w-lg leading-relaxed">
               Nexura's task portal replaces the scattered spreadsheets and DMs with one place to assign work, submit it, and track every review — from first draft to final approval.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-4">
@@ -69,7 +69,7 @@ export default function Landing() {
 
           {/* Signature pipeline visual */}
           <div className="relative">
-            <div className="glass-panel rounded-2xl p-6 sm:p-8 shadow-glow-purple">
+            <div className="glass-panel rounded-2xl p-5 sm:p-8 shadow-glow-purple">
               <p className="text-xs font-semibold uppercase tracking-wider text-nexura-300 mb-6">The task lifecycle</p>
               <div className="relative">
                 {PIPELINE.map((step, i) => {
@@ -109,9 +109,9 @@ export default function Landing() {
 
       {/* Features */}
       <section className="bg-nexura-900 border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-6 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
           <div className="max-w-xl mb-12">
-            <h2 className="font-display text-3xl font-bold">Everything the club needs, nothing it doesn't</h2>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold">Everything the club needs, nothing it doesn't</h2>
             <p className="text-nexura-300 mt-3">A focused workflow for coordinators to assign work and review it — and for members to submit it without the back-and-forth.</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -132,10 +132,10 @@ export default function Landing() {
       </section>
 
       {/* CTA */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
-        <div className="rounded-2xl bg-cta-gradient p-10 sm:p-14 text-center relative overflow-hidden">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
+        <div className="rounded-2xl bg-cta-gradient p-6 sm:p-10 md:p-14 text-center relative overflow-hidden">
           <div className="relative z-10">
-            <h2 className="font-display text-3xl font-bold">Ready to move your next task forward?</h2>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold">Ready to move your next task forward?</h2>
             <p className="text-white/85 mt-3 max-w-md mx-auto">Log in as a member to see your assigned tasks, or as a coordinator to start reviewing submissions.</p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Link to="/signup" className="bg-white text-nexura-700 font-semibold rounded-xl px-6 py-3 text-sm hover:bg-nexura-50 transition-colors">
@@ -150,7 +150,7 @@ export default function Landing() {
       </section>
 
       <footer className="border-t border-white/5 py-8">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-nexura-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-nexura-400">
           <span>© 2026 Nexura Technical Club. All rights reserved.</span>
           <span>Built by members, for members.</span>
         </div>

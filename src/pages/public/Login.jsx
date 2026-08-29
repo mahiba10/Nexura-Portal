@@ -25,7 +25,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-nexura-950 bg-nexura-radial flex items-center justify-center p-6">
+    <div className="min-h-screen bg-nexura-950 bg-nexura-radial flex items-center justify-center p-4 sm:p-6">
       <div className="w-full max-w-md">
         <Link to="/" className="flex items-center justify-center gap-2.5 mb-8">
           <div className="w-9 h-9 rounded-lg bg-cta-gradient flex items-center justify-center shadow-glow-purple">
@@ -34,7 +34,7 @@ export default function Login() {
           <span className="font-display font-extrabold text-lg tracking-wide text-white">NEXURA</span>
         </Link>
 
-        <div className="glass-panel rounded-2xl p-7 sm:p-8">
+        <div className="glass-panel rounded-2xl p-5 sm:p-8">
           <h1 className="font-display text-2xl font-bold text-white text-center">Welcome back</h1>
           <p className="text-sm text-nexura-300 text-center mt-1.5">Log in to your Nexura account</p>
 

@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Zap, Mail, Lock, User as UserIcon, ArrowRight } from "lucide-react";
+import { Zap, Mail, Lock, User as UserIcon, ArrowRight, GraduationCap, ShieldCheck } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 
 export default function Signup() {
   const { signup, pushToast } = useApp();
   const navigate = useNavigate();
+  const [role, setRole] = useState("student");
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [errors, setErrors] = useState({});
 
@@ -22,13 +23,13 @@ export default function Signup() {
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
 
-    signup(form.name, form.email);
-    pushToast("Account created — welcome to Nexura!");
-    navigate("/student/dashboard");
+    signup(form.name, form.email, role);
+    pushToast(`Account created — welcome to Nexura, ${role === "admin" ? "Coordinator" : "member"}!`);
+    navigate(role === "admin" ? "/admin/dashboard" : "/student/dashboard");
   };
 
   return (
-    <div className="min-h-screen bg-nexura-950 bg-nexura-radial flex items-center justify-center p-6">
+    <div className="min-h-screen bg-nexura-950 bg-nexura-radial flex items-center justify-center p-4 sm:p-6">
       <div className="w-full max-w-md">
         <Link to="/" className="flex items-center justify-center gap-2.5 mb-8">
           <div className="w-9 h-9 rounded-lg bg-cta-gradient flex items-center justify-center shadow-glow-purple">
@@ -37,11 +38,34 @@ export default function Signup() {
           <span className="font-display font-extrabold text-lg tracking-wide text-white">NEXURA</span>
         </Link>
 
-        <div className="glass-panel rounded-2xl p-7 sm:p-8">
+        <div className="glass-panel rounded-2xl p-5 sm:p-8">
           <h1 className="font-display text-2xl font-bold text-white text-center">Join Nexura</h1>
-          <p className="text-sm text-nexura-300 text-center mt-1.5">Create your member account to start receiving tasks</p>
+          <p className="text-sm text-nexura-300 text-center mt-1.5">
+            Create your {role === "admin" ? "coordinator" : "member"} account to {role === "admin" ? "start managing tasks" : "start receiving tasks"}
+          </p>
 
-          <form onSubmit={handleSubmit} className="mt-7 space-y-4">
+          <div className="grid grid-cols-2 gap-2 mt-6 p-1 rounded-xl bg-white/5 border border-white/10">
+            <button
+              type="button"
+              onClick={() => setRole("student")}
+              className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                role === "student" ? "bg-white text-nexura-700 shadow" : "text-nexura-200 hover:text-white"
+              }`}
+            >
+              <GraduationCap className="w-4 h-4" /> Student
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole("admin")}
+              className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                role === "admin" ? "bg-white text-nexura-700 shadow" : "text-nexura-200 hover:text-white"
+              }`}
+            >
+              <ShieldCheck className="w-4 h-4" /> Coordinator
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div>
               <label className="block text-sm font-medium text-nexura-200 mb-1.5">Full name</label>
               <div className="relative">
@@ -85,7 +109,7 @@ export default function Signup() {
             </div>
 
             <button type="submit" className="btn-primary w-full py-3 mt-2">
-              Create account <ArrowRight className="w-4 h-4" />
+              Create {role === "admin" ? "coordinator" : "member"} account <ArrowRight className="w-4 h-4" />
             </button>
           </form>
 

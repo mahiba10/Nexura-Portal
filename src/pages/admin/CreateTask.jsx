@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Plus, X, Send, Users } from "lucide-react";
+import { ArrowLeft, Plus, X, Send, Users, Code2 } from "lucide-react";
 import { useApp } from "../../context/AppContext";
-import { CATEGORIES, DIFFICULTIES } from "../../data/mockData";
+import { DIFFICULTIES } from "../../data/mockData";
+
+const FIXED_CATEGORY = "Web Development";
 
 export default function CreateTask() {
   const { students, createTask } = useApp();
   const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState(CATEGORIES[0]);
   const [description, setDescription] = useState("");
   const [difficulty, setDifficulty] = useState(DIFFICULTIES[1]);
   const [points, setPoints] = useState(100);
@@ -51,7 +52,7 @@ export default function CreateTask() {
 
     createTask({
       title: title.trim(),
-      category,
+      category: FIXED_CATEGORY,
       description: description.trim(),
       difficulty,
       points: Number(points),
@@ -78,9 +79,10 @@ export default function CreateTask() {
         <div className="grid sm:grid-cols-3 gap-4">
           <div>
             <label className="label-text">Category</label>
-            <select value={category} onChange={(e) => setCategory(e.target.value)} className="input-field">
-              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
+            <div className="input-field flex items-center gap-2 text-nexura-200 bg-white/[0.03] cursor-not-allowed select-none">
+              <Code2 className="w-4 h-4 text-nexura-400 shrink-0" />
+              {FIXED_CATEGORY}
+            </div>
           </div>
           <div>
             <label className="label-text">Difficulty</label>
@@ -132,7 +134,7 @@ export default function CreateTask() {
         </div>
 
         <div>
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
             <label className="label-text flex items-center gap-2 mb-0"><Users className="w-4 h-4 text-nexura-400" /> Assign to students</label>
             <button type="button" onClick={toggleAll} className="text-xs font-semibold text-nexura-300 hover:text-nexura-200">
               {assignedTo.length === students.length ? "Deselect all" : "Select all"}

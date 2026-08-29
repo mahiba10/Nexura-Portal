@@ -28,7 +28,18 @@ export function AppProvider({ children }) {
     }
   }, []);
 
-  const signup = useCallback((name, email) => {
+  const signup = useCallback((name, email, role = "student") => {
+    if (role === "admin") {
+      const newAdmin = {
+        id: nextId("a"),
+        name,
+        email,
+        role: "Faculty Coordinator",
+        avatarColor: "#5B21B6",
+      };
+      setAuth({ role: "admin", user: newAdmin });
+      return;
+    }
     const newStudent = {
       id: nextId("s"),
       name,

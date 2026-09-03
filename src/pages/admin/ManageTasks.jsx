@@ -30,7 +30,7 @@ export default function ManageTasks() {
             className="bg-transparent outline-none text-sm w-full placeholder:text-slate/60"
           />
         </div>
-        <Link to="/admin/tasks/create" className="btn-primary text-sm">
+        <Link to="/coordinator/tasks/create" className="btn-primary text-sm">
           <PlusSquare className="w-4 h-4" /> Create Task
         </Link>
       </div>
@@ -50,11 +50,11 @@ export default function ManageTasks() {
               <p className="text-sm text-slate line-clamp-2">{task.description}</p>
               <div className="flex items-center flex-wrap gap-x-4 gap-y-2 text-xs text-slate">
                 <span className="inline-flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5" /> Due {formatDate(task.deadline)}</span>
-                <span className="inline-flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> {task.assignedTo.length} assigned</span>
+                <span className="inline-flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> {task.assignedTo?.length || 0} assigned</span>
                 <span className="text-nexura-300 font-medium">{submissionCount(task.id)} submitted</span>
               </div>
               <div className="flex items-center gap-2 pt-2 border-t border-white/5">
-                <Link to={`/admin/submissions?task=${task.id}`} className="btn-ghost text-sm flex-1 justify-center bg-white/5">
+                <Link to={`/coordinator/submissions?task=${task.id}`} className="btn-ghost text-sm flex-1 justify-center bg-white/5">
                   View Submissions
                 </Link>
                 <button

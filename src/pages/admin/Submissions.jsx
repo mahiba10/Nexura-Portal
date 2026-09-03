@@ -10,7 +10,7 @@ import { getStudentById, getTaskById } from "../../data/mockData";
 const STATUS_FILTERS = ["all", "pending", "approved", "rejected"];
 
 export default function Submissions() {
-  const { submissions, tasks, removeSubmission } = useApp();
+  const { submissions, tasks, removeSubmission, getStudent, getTask } = useApp();
   const [searchParams, setSearchParams] = useSearchParams();
   const taskFilter = searchParams.get("task") || "all";
   const [status, setStatus] = useState("all");
@@ -23,15 +23,19 @@ export default function Submissions() {
       .filter((s) => status === "all" || s.status === status)
       .filter((s) => {
         if (!query.trim()) return true;
-        const student = getStudentById(s.studentId);
-        const task = getTaskById(s.taskId);
+        const student = getStudent(s.studentId);
+        const task = getTask(s.taskId);
         const q = query.toLowerCase();
-        return student?.name.toLowerCase().includes(q) || task?.title.toLowerCase().includes(q) || student?.rollNo.toLowerCase().includes(q);
+        return (
+          (student?.name || "").toLowerCase().includes(q) ||
+          (task?.title || "").toLowerCase().includes(q) ||
+          (student?.rollNo || "").toLowerCase().includes(q)
+        );
       })
       .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
-  }, [submissions, taskFilter, status, query]);
+  }, [submissions, taskFilter, status, query, getStudent, getTask]);
 
-  const filterTask = taskFilter !== "all" ? getTaskById(taskFilter) : null;
+  const filterTask = taskFilter !== "all" ? getTask(taskFilter) : null;
 
   return (
     <div className="space-y-6">

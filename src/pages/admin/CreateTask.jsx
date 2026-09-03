@@ -15,9 +15,14 @@ export default function CreateTask() {
   const [difficulty, setDifficulty] = useState(DIFFICULTIES[1]);
   const [points, setPoints] = useState(100);
   const [deadline, setDeadline] = useState("");
-  const [requirements, setRequirements] = useState([""]);
-  const [assignedTo, setAssignedTo] = useState(students.map((s) => s.id));
+  const [assignedTo, setAssignedTo] = useState(() => students.map((s) => s.id));
   const [errors, setErrors] = useState({});
+
+  React.useEffect(() => {
+    if (students && students.length > 0) {
+      setAssignedTo((prev) => (prev.length === 0 ? students.map((s) => s.id) : prev));
+    }
+  }, [students]);
 
   const updateRequirement = (i, value) => {
     setRequirements((prev) => prev.map((r, idx) => (idx === i ? value : r)));
@@ -44,28 +49,37 @@ export default function CreateTask() {
     return errs;
   };
 
-  const handleSubmit = (e) => {
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
 
-    createTask({
-      title: title.trim(),
-      category: FIXED_CATEGORY,
-      description: description.trim(),
-      difficulty,
-      points: Number(points),
-      deadline,
-      requirements: requirements.filter((r) => r.trim()),
-      assignedTo,
-    });
-    navigate("/admin/tasks");
+    setSubmitting(true);
+    try {
+      await createTask({
+        title: title.trim(),
+        category: FIXED_CATEGORY,
+        description: description.trim(),
+        difficulty,
+        points: Number(points),
+        deadline,
+        requirements: requirements.filter((r) => r.trim()),
+        assignedTo,
+      });
+      navigate("/coordinator/tasks");
+    } catch (err) {
+      setErrors({ form: err.message || "Failed to create task" });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <Link to="/admin/tasks" className="inline-flex items-center gap-1.5 text-sm font-medium text-nexura-300 hover:text-nexura-200">
+      <Link to="/coordinator/tasks" className="inline-flex items-center gap-1.5 text-sm font-medium text-nexura-300 hover:text-nexura-200">
         <ArrowLeft className="w-4 h-4" /> Back to Manage Tasks
       </Link>
 
@@ -160,8 +174,10 @@ export default function CreateTask() {
           {errors.assignedTo && <p className="text-xs text-red-400 mt-1">{errors.assignedTo}</p>}
         </div>
 
-        <button type="submit" className="btn-primary w-full py-3">
-          Create & Assign Task <Send className="w-4 h-4" />
+        {errors.form && <p className="text-sm text-red-400 bg-red-500/10 rounded-lg px-3.5 py-2.5">{errors.form}</p>}
+
+        <button type="submit" disabled={submitting} className="btn-primary w-full py-3">
+          {submitting ? "Creating Task..." : <>Create & Assign Task <Send className="w-4 h-4" /></>}
         </button>
       </form>
     </div>

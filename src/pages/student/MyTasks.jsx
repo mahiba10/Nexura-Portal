@@ -16,13 +16,13 @@ const FILTERS = [
 
 export default function MyTasks() {
   const { auth, tasks, submissions } = useApp();
-  const studentId = auth.user.id;
+  const studentId = auth?.user?.id || "s1";
   const [filter, setFilter] = useState("all");
   const [query, setQuery] = useState("");
 
   const myTasks = useMemo(() => {
     return tasks
-      .filter((t) => t.assignedTo.includes(studentId))
+      .filter((t) => !t.assignedTo || t.assignedTo.length === 0 || t.assignedTo.includes(studentId))
       .map((t) => ({ task: t, status: getSubmissionStatusForTask(submissions, t.id, studentId) }))
       .filter(({ task, status }) => task.title.toLowerCase().includes(query.toLowerCase()))
       .filter(({ task, status }) => {

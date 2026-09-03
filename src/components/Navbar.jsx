@@ -3,20 +3,33 @@ import { useNavigate } from "react-router-dom";
 import { Menu, Bell, Search } from "lucide-react";
 import { useApp } from "../context/AppContext";
 
-export default function Navbar({ role, title, onOpenMobile, showSearch = false, searchValue, onSearchChange, searchPlaceholder = "Search..." }) {
+export default function Navbar({
+  role,
+  title,
+  onOpenMobile,
+  showSearch = false,
+  searchValue,
+  onSearchChange,
+  searchPlaceholder = "Search...",
+}) {
   const navigate = useNavigate();
   const { studentNotifs, adminNotifs } = useApp();
-  const notifs = role === "admin" ? adminNotifs : studentNotifs;
+  const notifs = role === "coordinator" ? adminNotifs : studentNotifs;
   const unread = notifs.filter((n) => !n.read).length;
 
   return (
     <header className="sticky top-0 z-30 bg-nexura-950/80 backdrop-blur-xl border-b border-white/10">
       <div className="flex items-center justify-between gap-4 px-4 sm:px-6 py-4">
         <div className="flex items-center gap-3 min-w-0">
-          <button onClick={onOpenMobile} className="lg:hidden text-nexura-200 shrink-0">
+          <button
+            onClick={onOpenMobile}
+            className="lg:hidden text-nexura-200 shrink-0"
+          >
             <Menu className="w-6 h-6" />
           </button>
-          <h1 className="font-display font-bold text-lg sm:text-xl text-white truncate">{title}</h1>
+          <h1 className="font-display font-bold text-lg sm:text-xl text-white truncate">
+            {title}
+          </h1>
         </div>
 
         <div className="flex items-center gap-3 shrink-0">

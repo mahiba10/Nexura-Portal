@@ -38,24 +38,27 @@ export default function SubmitTask() {
     return errs;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
 
     setSubmitting(true);
-    setTimeout(() => {
+    try {
       const newAttempt = isResubmit ? (latestSub?.attempt || 1) + 1 : 1;
-      const sub = submitTask(
+      const sub = await submitTask(
         task.id,
         studentId,
-        { fileName: file?.name || "", githubUrl: githubUrl.trim(), liveUrl: liveUrl.trim(), notes: notes.trim() },
+        { file, fileName: file?.name || "", githubUrl: githubUrl.trim(), liveUrl: liveUrl.trim(), notes: notes.trim() },
         newAttempt
       );
-      setSubmitting(false);
       navigate(`/student/submissions/${sub.id}`);
-    }, 600);
+    } catch (err) {
+      setErrors({ form: err.message || "Failed to submit task" });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (

@@ -31,10 +31,10 @@ export default function Dashboard() {
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
           <div>
             <p className="text-nexura-200 text-sm font-medium">Welcome back,</p>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold mt-1">{auth.user.name} 👋</h2>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold mt-1">{auth?.user?.name || "Coordinator"} 👋</h2>
             <p className="text-nexura-200 text-sm mt-2">{counts.pending} submission{counts.pending === 1 ? "" : "s"} waiting for your review.</p>
           </div>
-          <Link to="/admin/tasks/create" className="btn-primary text-sm shrink-0">
+          <Link to="/coordinator/tasks/create" className="btn-primary text-sm shrink-0">
             <PlusSquare className="w-4 h-4" /> Create Task
           </Link>
         </div>
@@ -51,7 +51,7 @@ export default function Dashboard() {
       <div className="card p-6">
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-display font-semibold text-white">Recent Submissions</h3>
-          <Link to="/admin/submissions" className="text-sm font-medium text-nexura-300 hover:text-nexura-200 inline-flex items-center gap-1">
+          <Link to="/coordinator/submissions" className="text-sm font-medium text-nexura-300 hover:text-nexura-200 inline-flex items-center gap-1">
             View all <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>

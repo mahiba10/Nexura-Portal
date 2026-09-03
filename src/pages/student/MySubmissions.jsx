@@ -9,17 +9,18 @@ import { formatDateTime, getTaskById } from "../../data/mockData";
 const FILTERS = ["all", "pending", "approved", "rejected"];
 
 export default function MySubmissions() {
-  const { auth, submissions } = useApp();
+  const { auth, submissions, getTask } = useApp();
   const [filter, setFilter] = useState("all");
   const [query, setQuery] = useState("");
+  const studentId = auth?.user?.id || "s1";
 
   const mySubs = useMemo(() => {
     return submissions
-      .filter((s) => s.studentId === auth.user.id)
+      .filter((s) => s.studentId === studentId)
       .filter((s) => filter === "all" || s.status === filter)
-      .filter((s) => getTaskById(s.taskId)?.title.toLowerCase().includes(query.toLowerCase()))
+      .filter((s) => (getTask(s.taskId)?.title || "").toLowerCase().includes(query.toLowerCase()))
       .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
-  }, [submissions, auth.user.id, filter, query]);
+  }, [submissions, studentId, filter, query, getTask]);
 
   return (
     <div className="space-y-6">
@@ -55,7 +56,7 @@ export default function MySubmissions() {
       ) : (
         <div className="card divide-y divide-white/5">
           {mySubs.map((sub) => {
-            const task = getTaskById(sub.taskId);
+            const task = getTask(sub.taskId);
             return (
               <Link key={sub.id} to={`/student/submissions/${sub.id}`} className="flex items-center justify-between gap-4 p-4 sm:p-5 hover:bg-white/5 transition-colors">
                 <div className="min-w-0 flex-1">

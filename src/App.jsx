@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppProvider, useApp } from "./context/AppContext";
+import { isCoordinatorRole } from "./lib/roleGuard";
 import ToastContainer from "./components/Toast";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -30,6 +31,7 @@ import AdminProfile from "./pages/admin/Profile";
 
 function AppRoutes() {
   const { auth } = useApp();
+  const isCoordinator = auth ? isCoordinatorRole(auth.role) : false;
 
   return (
     <Routes>
@@ -37,11 +39,33 @@ function AppRoutes() {
       <Route path="/" element={<Landing />} />
       <Route
         path="/login"
-        element={auth ? <Navigate to={auth.role === "admin" ? "/admin/dashboard" : "/student/dashboard"} replace /> : <Login />}
+        element={
+          auth ? (
+            <Navigate
+              to={
+                isCoordinator ? "/coordinator/dashboard" : "/student/dashboard"
+              }
+              replace
+            />
+          ) : (
+            <Login />
+          )
+        }
       />
       <Route
         path="/signup"
-        element={auth ? <Navigate to={auth.role === "admin" ? "/admin/dashboard" : "/student/dashboard"} replace /> : <Signup />}
+        element={
+          auth ? (
+            <Navigate
+              to={
+                isCoordinator ? "/coordinator/dashboard" : "/student/dashboard"
+              }
+              replace
+            />
+          ) : (
+            <Signup />
+          )
+        }
       />
 
       {/* Student */}
@@ -64,11 +88,11 @@ function AppRoutes() {
         <Route path="profile" element={<StudentProfile />} />
       </Route>
 
-      {/* Admin */}
+      {/* Coordinator */}
       <Route
-        path="/admin"
+        path="/coordinator"
         element={
-          <ProtectedRoute role="admin">
+          <ProtectedRoute role="coordinator">
             <AdminLayout />
           </ProtectedRoute>
         }
@@ -83,6 +107,44 @@ function AppRoutes() {
         <Route path="notifications" element={<AdminNotifications />} />
         <Route path="profile" element={<AdminProfile />} />
       </Route>
+
+      {/* Admin Route Aliases for backwards compatibility */}
+      <Route
+        path="/admin"
+        element={<Navigate to="/coordinator/dashboard" replace />}
+      />
+      <Route
+        path="/admin/dashboard"
+        element={<Navigate to="/coordinator/dashboard" replace />}
+      />
+      <Route
+        path="/admin/tasks"
+        element={<Navigate to="/coordinator/tasks" replace />}
+      />
+      <Route
+        path="/admin/tasks/create"
+        element={<Navigate to="/coordinator/tasks/create" replace />}
+      />
+      <Route
+        path="/admin/students"
+        element={<Navigate to="/coordinator/students" replace />}
+      />
+      <Route
+        path="/admin/submissions"
+        element={<Navigate to="/coordinator/submissions" replace />}
+      />
+      <Route
+        path="/admin/submissions/:id"
+        element={<Navigate to="/coordinator/submissions" replace />}
+      />
+      <Route
+        path="/admin/notifications"
+        element={<Navigate to="/coordinator/notifications" replace />}
+      />
+      <Route
+        path="/admin/profile"
+        element={<Navigate to="/coordinator/profile" replace />}
+      />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />

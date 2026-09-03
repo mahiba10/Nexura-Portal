@@ -5,18 +5,22 @@ import ProgressBar from "../../components/ProgressBar";
 import { formatDate, getSubmissionStatusForTask } from "../../data/mockData";
 
 export default function Profile() {
-  const { auth, tasks, submissions, pushToast } = useApp();
-  const student = auth.user;
-  const [name, setName] = useState(student.name);
-  const [email, setEmail] = useState(student.email);
+  const { auth, tasks, submissions, updateProfile } = useApp();
+  const student = auth?.user || { name: "Student", email: "student@nexura.club", rollNo: "CS21B045", branch: "Computer Science", year: "3rd Year", joined: "2024-08-12", avatarColor: "#7C3AED" };
+  const [name, setName] = useState(student.name || "");
+  const [email, setEmail] = useState(student.email || "");
 
-  const myTasks = useMemo(() => tasks.filter((t) => t.assignedTo.includes(student.id)), [tasks, student.id]);
-  const approved = myTasks.filter((t) => getSubmissionStatusForTask(submissions, t.id, student.id) === "approved");
-  const points = approved.reduce((sum, t) => sum + t.points, 0);
+  const studentId = student.id || "s1";
+  const myTasks = useMemo(
+    () => tasks.filter((t) => !t.assignedTo || t.assignedTo.length === 0 || t.assignedTo.includes(studentId)),
+    [tasks, studentId]
+  );
+  const approved = myTasks.filter((t) => getSubmissionStatusForTask(submissions, t.id, studentId) === "approved");
+  const points = approved.reduce((sum, t) => sum + (t.points || 0), 0);
 
   const handleSave = (e) => {
     e.preventDefault();
-    pushToast("Profile updated successfully");
+    updateProfile(name.trim(), email.trim());
   };
 
   return (
@@ -24,13 +28,13 @@ export default function Profile() {
       <div className="card p-6 sm:p-7 flex items-center gap-5 flex-wrap">
         <div
           className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-display font-bold shrink-0"
-          style={{ backgroundColor: student.avatarColor }}
+          style={{ backgroundColor: student.avatarColor || "#7C3AED" }}
         >
-          {student.name.charAt(0)}
+          {(student.name || "S").charAt(0)}
         </div>
         <div className="flex-1 min-w-0">
-          <h1 className="font-display text-xl font-bold text-white">{student.name}</h1>
-          <p className="text-sm text-slate">{student.rollNo} · {student.branch}</p>
+          <h1 className="font-display text-xl font-bold text-white">{student.name || "Student"}</h1>
+          <p className="text-sm text-slate">{student.rollNo || "N/A"} · {student.branch || "N/A"}</p>
         </div>
         <div className="flex items-center gap-2 bg-white/5 text-nexura-200 rounded-xl px-4 py-2.5">
           <Award className="w-4.5 h-4.5" />

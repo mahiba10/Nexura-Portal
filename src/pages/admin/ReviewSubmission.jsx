@@ -10,7 +10,7 @@ import { formatDateTime, getStudentById, getTaskById } from "../../data/mockData
 export default function ReviewSubmission() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { submissions, reviewSubmission, removeSubmission } = useApp();
+  const { submissions, reviewSubmission, removeSubmission, getStudent, getTask } = useApp();
   const sub = submissions.find((s) => s.id === id);
 
   const [rejectOpen, setRejectOpen] = useState(false);
@@ -19,10 +19,10 @@ export default function ReviewSubmission() {
   const [confirmApprove, setConfirmApprove] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState(false);
 
-  if (!sub) return <Navigate to="/admin/submissions" replace />;
+  if (!sub) return <Navigate to="/coordinator/submissions" replace />;
 
-  const student = getStudentById(sub.studentId);
-  const task = getTaskById(sub.taskId);
+  const student = getStudent(sub.studentId);
+  const task = getTask(sub.taskId);
 
   const handleApprove = () => {
     reviewSubmission(sub.id, "approved", "Great work — this meets all the requirements. Approved!");
@@ -41,12 +41,12 @@ export default function ReviewSubmission() {
 
   const handleRemove = () => {
     removeSubmission(sub.id);
-    navigate("/admin/submissions");
+    navigate("/coordinator/submissions");
   };
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <Link to="/admin/submissions" className="inline-flex items-center gap-1.5 text-sm font-medium text-nexura-300 hover:text-nexura-200">
+      <Link to="/coordinator/submissions" className="inline-flex items-center gap-1.5 text-sm font-medium text-nexura-300 hover:text-nexura-200">
         <ArrowLeft className="w-4 h-4" /> Back to Submissions
       </Link>
 

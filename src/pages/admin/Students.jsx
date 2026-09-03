@@ -10,16 +10,29 @@ export default function Students() {
 
   const filtered = useMemo(
     () =>
-      students.filter(
-        (s) => s.name.toLowerCase().includes(query.toLowerCase()) || s.rollNo.toLowerCase().includes(query.toLowerCase())
+      (students || []).filter(
+        (s) =>
+          (s.name || "").toLowerCase().includes(query.toLowerCase()) ||
+          (s.rollNo || "").toLowerCase().includes(query.toLowerCase()),
       ),
-    [students, query]
+    [students, query],
   );
 
   const statsFor = (studentId) => {
-    const myTasks = tasks.filter((t) => t.assignedTo.includes(studentId));
-    const approved = myTasks.filter((t) => getSubmissionStatusForTask(submissions, t.id, studentId) === "approved").length;
-    const pending = myTasks.filter((t) => getSubmissionStatusForTask(submissions, t.id, studentId) === "pending").length;
+    const myTasks = tasks.filter(
+      (t) =>
+        !t.assignedTo ||
+        t.assignedTo.length === 0 ||
+        t.assignedTo.includes(studentId),
+    );
+    const approved = myTasks.filter(
+      (t) =>
+        getSubmissionStatusForTask(submissions, t.id, studentId) === "approved",
+    ).length;
+    const pending = myTasks.filter(
+      (t) =>
+        getSubmissionStatusForTask(submissions, t.id, studentId) === "pending",
+    ).length;
     return { total: myTasks.length, approved, pending };
   };
 
@@ -36,7 +49,13 @@ export default function Students() {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="card"><EmptyState icon={Users} title="No students found" message="Try a different search term." /></div>
+        <div className="card">
+          <EmptyState
+            icon={Users}
+            title="No students found"
+            message="Try a different search term."
+          />
+        </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((s) => {
@@ -46,9 +65,9 @@ export default function Students() {
                 <div className="flex items-center gap-3">
                   <div
                     className="w-11 h-11 rounded-full flex items-center justify-center text-white font-display font-semibold shrink-0"
-                    style={{ backgroundColor: s.avatarColor }}
+                    style={{ backgroundColor: s.avatarColor || "#7C3AED" }}
                   >
-                    {s.name.charAt(0)}
+                    {(s.name || "S").charAt(0)}
                   </div>
                   <div className="min-w-0">
                     <p className="font-medium text-white truncate">{s.name}</p>
@@ -56,21 +75,38 @@ export default function Students() {
                   </div>
                 </div>
                 <div className="mt-4 space-y-1.5 text-sm text-slate">
-                  <div className="flex justify-between"><span>Branch</span><span className="text-white font-medium">{s.branch}</span></div>
-                  <div className="flex justify-between"><span>Year</span><span className="text-white font-medium">{s.year}</span></div>
-                  <div className="flex justify-between"><span>Joined</span><span className="text-white font-medium">{formatDate(s.joined)}</span></div>
+                  <div className="flex justify-between">
+                    <span>Branch</span>
+                    <span className="text-white font-medium">{s.branch}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Year</span>
+                    <span className="text-white font-medium">{s.year}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Joined</span>
+                    <span className="text-white font-medium">
+                      {formatDate(s.joined)}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2 mt-4 pt-4 border-t border-white/5">
                   <div className="flex-1 text-center">
-                    <p className="font-display font-bold text-white">{stats.total}</p>
+                    <p className="font-display font-bold text-white">
+                      {stats.total}
+                    </p>
                     <p className="text-xs text-slate">Assigned</p>
                   </div>
                   <div className="flex-1 text-center">
-                    <p className="font-display font-bold text-emerald-400">{stats.approved}</p>
+                    <p className="font-display font-bold text-emerald-400">
+                      {stats.approved}
+                    </p>
                     <p className="text-xs text-slate">Approved</p>
                   </div>
                   <div className="flex-1 text-center">
-                    <p className="font-display font-bold text-amber-400">{stats.pending}</p>
+                    <p className="font-display font-bold text-amber-400">
+                      {stats.pending}
+                    </p>
                     <p className="text-xs text-slate">Pending</p>
                   </div>
                 </div>

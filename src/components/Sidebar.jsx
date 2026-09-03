@@ -1,8 +1,17 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import {
-  LayoutDashboard, ListChecks, FolderCheck, Bell, User, X,
-  PlusSquare, Users, Inbox, Zap, LogOut,
+  LayoutDashboard,
+  ListChecks,
+  FolderCheck,
+  Bell,
+  User,
+  X,
+  PlusSquare,
+  Users,
+  Inbox,
+  Zap,
+  LogOut,
 } from "lucide-react";
 import { useApp } from "../context/AppContext";
 
@@ -14,27 +23,30 @@ const STUDENT_LINKS = [
   { to: "/student/profile", label: "Profile", icon: User },
 ];
 
-const ADMIN_LINKS = [
-  { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/admin/tasks", label: "Manage Tasks", icon: ListChecks },
-  { to: "/admin/tasks/create", label: "Create Task", icon: PlusSquare },
-  { to: "/admin/students", label: "Students", icon: Users },
-  { to: "/admin/submissions", label: "Submissions", icon: Inbox },
-  { to: "/admin/notifications", label: "Notifications", icon: Bell },
-  { to: "/admin/profile", label: "Profile", icon: User },
+const COORDINATOR_LINKS = [
+  { to: "/coordinator/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/coordinator/tasks", label: "Manage Tasks", icon: ListChecks },
+  { to: "/coordinator/tasks/create", label: "Create Task", icon: PlusSquare },
+  { to: "/coordinator/students", label: "Students", icon: Users },
+  { to: "/coordinator/submissions", label: "Submissions", icon: Inbox },
+  { to: "/coordinator/notifications", label: "Notifications", icon: Bell },
+  { to: "/coordinator/profile", label: "Profile", icon: User },
 ];
 
 export default function Sidebar({ role, mobileOpen, onCloseMobile }) {
   const { auth, logout } = useApp();
-  const links = role === "admin" ? ADMIN_LINKS : STUDENT_LINKS;
+  const links = role === "coordinator" ? COORDINATOR_LINKS : STUDENT_LINKS;
 
   return (
     <>
       {mobileOpen && (
-        <div className="fixed inset-0 bg-nexura-950/60 z-40 lg:hidden" onClick={onCloseMobile} />
+        <div
+          className="fixed inset-0 bg-nexura-950/60 z-40 lg:hidden"
+          onClick={onCloseMobile}
+        />
       )}
       <aside
-        className={`fixed lg:sticky top-0 h-screen w-72 bg-nexura-gradient bg-nexura-radial text-white flex flex-col z-50 border-r border-white/5 shadow-2xl shadow-black/40 transition-transform duration-300 shrink-0 ${
+        className={`fixed lg:sticky top-0 h-screen w-72 bg-nexura-gradient text-white flex flex-col z-50 border-r border-white/5 shadow-2xl shadow-black/40 transition-transform duration-300 shrink-0 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
@@ -44,11 +56,20 @@ export default function Sidebar({ role, mobileOpen, onCloseMobile }) {
               <Zap className="w-5 h-5 text-white" fill="white" />
             </div>
             <div>
-              <p className="font-display font-extrabold text-lg tracking-wide leading-none">NEXURA</p>
-              <p className="text-[11px] text-nexura-200 mt-1">{role === "admin" ? "Coordinator Portal" : "Member Portal"}</p>
+              <p className="font-display font-extrabold text-lg tracking-wide leading-none">
+                NEXURA
+              </p>
+              <p className="text-[11px] text-nexura-200 mt-1">
+                {role === "coordinator"
+                  ? "Coordinator Portal"
+                  : "Member Portal"}
+              </p>
             </div>
           </div>
-          <button onClick={onCloseMobile} className="lg:hidden text-nexura-200 hover:text-white">
+          <button
+            onClick={onCloseMobile}
+            className="lg:hidden text-nexura-200 hover:text-white"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -83,8 +104,12 @@ export default function Sidebar({ role, mobileOpen, onCloseMobile }) {
               {auth?.user?.name?.charAt(0) || "?"}
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium text-white truncate">{auth?.user?.name}</p>
-              <p className="text-xs text-nexura-300 truncate">{auth?.user?.email}</p>
+              <p className="text-sm font-medium text-white truncate">
+                {auth?.user?.name}
+              </p>
+              <p className="text-xs text-nexura-300 truncate">
+                {auth?.user?.email}
+              </p>
             </div>
           </div>
           <button

@@ -10,9 +10,12 @@ import { formatDate, daysUntil, getSubmissionStatusForTask, timeAgo } from "../.
 
 export default function Dashboard() {
   const { auth, tasks, submissions, studentNotifs } = useApp();
-  const studentId = auth.user.id;
+  const studentId = auth?.user?.id || "s1";
 
-  const myTasks = useMemo(() => tasks.filter((t) => t.assignedTo.includes(studentId)), [tasks, studentId]);
+  const myTasks = useMemo(
+    () => tasks.filter((t) => !t.assignedTo || t.assignedTo.length === 0 || t.assignedTo.includes(studentId)),
+    [tasks, studentId]
+  );
 
   const statuses = useMemo(
     () => myTasks.map((t) => ({ task: t, status: getSubmissionStatusForTask(submissions, t.id, studentId) })),
@@ -58,7 +61,7 @@ export default function Dashboard() {
       <div className="rounded-xl2 bg-nexura-gradient bg-nexura-radial p-6 sm:p-8 text-white relative overflow-hidden">
         <div className="relative z-10">
           <p className="text-nexura-200 text-sm font-medium">Welcome back,</p>
-          <h2 className="font-display text-2xl sm:text-3xl font-bold mt-1">{auth.user.name.split(" ")[0]} 👋</h2>
+          <h2 className="font-display text-2xl sm:text-3xl font-bold mt-1">{auth?.user?.name ? auth.user.name.split(" ")[0] : "Student"} 👋</h2>
           <p className="text-nexura-200 text-sm mt-2 max-w-md">
             You have {counts.pending} submission{counts.pending === 1 ? "" : "s"} under review and {counts.notSubmitted} task{counts.notSubmitted === 1 ? "" : "s"} awaiting your work.
           </p>

@@ -3,10 +3,10 @@ import { Mail, ShieldCheck, CalendarDays, Users, ListChecks, Save } from "lucide
 import { useApp } from "../../context/AppContext";
 
 export default function Profile() {
-  const { auth, students, tasks, submissions, pushToast } = useApp();
-  const admin = auth.user;
-  const [name, setName] = useState(admin.name);
-  const [email, setEmail] = useState(admin.email);
+  const { auth, students, tasks, submissions, updateProfile } = useApp();
+  const admin = auth?.user || { name: "Prof. Sameer Rao", email: "sameer.rao@nexura.club", role: "Faculty Coordinator", avatarColor: "#5B21B6" };
+  const [name, setName] = useState(admin.name || "");
+  const [email, setEmail] = useState(admin.email || "");
 
   const stats = useMemo(() => {
     const approved = submissions.filter((s) => s.status === "approved").length;
@@ -16,7 +16,7 @@ export default function Profile() {
 
   const handleSave = (e) => {
     e.preventDefault();
-    pushToast("Profile updated successfully");
+    updateProfile(name.trim(), email.trim());
   };
 
   return (
@@ -24,13 +24,13 @@ export default function Profile() {
       <div className="card p-6 sm:p-7 flex items-center gap-5 flex-wrap">
         <div
           className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-display font-bold shrink-0"
-          style={{ backgroundColor: admin.avatarColor }}
+          style={{ backgroundColor: admin.avatarColor || "#5B21B6" }}
         >
-          {admin.name.charAt(0)}
+          {(admin.name || "A").charAt(0)}
         </div>
         <div className="flex-1 min-w-0">
-          <h1 className="font-display text-xl font-bold text-white">{admin.name}</h1>
-          <p className="text-sm text-slate flex items-center gap-1.5 mt-0.5"><ShieldCheck className="w-4 h-4 text-nexura-400" /> {admin.role}</p>
+          <h1 className="font-display text-xl font-bold text-white">{admin.name || "Coordinator"}</h1>
+          <p className="text-sm text-slate flex items-center gap-1.5 mt-0.5"><ShieldCheck className="w-4 h-4 text-nexura-400" /> {admin.role || "Coordinator"}</p>
         </div>
       </div>
 

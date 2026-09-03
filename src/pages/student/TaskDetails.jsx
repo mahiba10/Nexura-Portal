@@ -19,7 +19,7 @@ export default function TaskDetails() {
 
   if (!task) return <Navigate to="/student/tasks" replace />;
 
-  const studentId = auth.user.id;
+  const studentId = auth?.user?.id || "s1";
   const status = getSubmissionStatusForTask(submissions, task.id, studentId);
   const latestSub = getLatestSubmission(submissions, task.id, studentId);
   const overdue = isOverdue(task.deadline, status);
@@ -44,7 +44,7 @@ export default function TaskDetails() {
           <span className="inline-flex items-center gap-1.5 text-sm text-slate bg-white/5 rounded-lg px-3 py-1.5">
             <CalendarDays className="w-4 h-4" /> Due {formatDate(task.deadline)}
           </span>
-          <span className={`inline-flex items-center gap-1.5 text-sm font-medium rounded-lg px-3 py-1.5 ${DIFFICULTY_COLOR[task.difficulty]}`}>
+          <span className={`inline-flex items-center gap-1.5 text-sm font-medium rounded-lg px-3 py-1.5 ${DIFFICULTY_COLOR[task.difficulty] || DIFFICULTY_COLOR.Intermediate}`}>
             <Layers className="w-4 h-4" /> {task.difficulty}
           </span>
           <span className="inline-flex items-center gap-1.5 text-sm text-slate bg-white/5 rounded-lg px-3 py-1.5">
@@ -65,7 +65,7 @@ export default function TaskDetails() {
         <div className="mt-6">
           <h3 className="font-display font-semibold text-white mb-3">Requirements</h3>
           <ul className="space-y-2.5">
-            {task.requirements.map((req, i) => (
+            {(task.requirements || []).map((req, i) => (
               <li key={i} className="flex items-start gap-2.5 text-sm text-slate">
                 <CheckCircle2 className="w-4 h-4 text-nexura-400 shrink-0 mt-0.5" />
                 {req}

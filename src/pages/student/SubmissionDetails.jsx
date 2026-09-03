@@ -7,11 +7,11 @@ import { formatDateTime, getTaskById } from "../../data/mockData";
 
 export default function SubmissionDetails() {
   const { id } = useParams();
-  const { submissions } = useApp();
+  const { submissions, getTask } = useApp();
   const sub = submissions.find((s) => s.id === id);
 
   if (!sub) return <Navigate to="/student/submissions" replace />;
-  const task = getTaskById(sub.taskId);
+  const task = getTask(sub.taskId);
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">

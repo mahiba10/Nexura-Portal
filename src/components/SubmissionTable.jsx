@@ -2,10 +2,12 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Github, Globe, Paperclip, Eye, Trash2 } from "lucide-react";
 import StatusBadge from "./StatusBadge";
-import { formatDateTime, getStudentById, getTaskById } from "../data/mockData";
+import { formatDateTime } from "../data/mockData";
+import { useApp } from "../context/AppContext";
 
 export default function SubmissionTable({ submissions, onRemove, emptyMessage = "No submissions found." }) {
   const navigate = useNavigate();
+  const { getStudent, getTask } = useApp();
 
   if (submissions.length === 0) {
     return (
@@ -28,8 +30,8 @@ export default function SubmissionTable({ submissions, onRemove, emptyMessage = 
         </thead>
         <tbody>
           {submissions.map((sub) => {
-            const student = getStudentById(sub.studentId);
-            const task = getTaskById(sub.taskId);
+            const student = getStudent(sub.studentId);
+            const task = getTask(sub.taskId);
             return (
               <tr key={sub.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                 <td className="px-2 py-3.5">
@@ -64,7 +66,7 @@ export default function SubmissionTable({ submissions, onRemove, emptyMessage = 
                 <td className="px-2 py-3.5">
                   <div className="flex items-center justify-end gap-1">
                     <button
-                      onClick={() => navigate(`/admin/submissions/${sub.id}`)}
+                      onClick={() => navigate(`/coordinator/submissions/${sub.id}`)}
                       className="w-8 h-8 rounded-lg flex items-center justify-center text-nexura-300 hover:bg-nexura-500/15 transition-colors"
                       aria-label="Review submission"
                       title="Review"

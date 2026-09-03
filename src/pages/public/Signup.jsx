@@ -1,7 +1,16 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Zap, Mail, Lock, User as UserIcon, ArrowRight, GraduationCap, ShieldCheck } from "lucide-react";
+import {
+  Zap,
+  Mail,
+  Lock,
+  User as UserIcon,
+  ArrowRight,
+  GraduationCap,
+  ShieldCheck,
+} from "lucide-react";
 import { useApp } from "../../context/AppContext";
+import { isCoordinatorRole } from "../../lib/roleGuard";
 
 export default function Signup() {
   const { signup, pushToast } = useApp();
@@ -10,22 +19,38 @@ export default function Signup() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [errors, setErrors] = useState({});
 
-  const update = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
+  const update = (key) => (e) =>
+    setForm((f) => ({ ...f, [key]: e.target.value }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = {};
     if (!form.name.trim()) errs.name = "Full name is required";
     if (!form.email.trim()) errs.email = "Email is required";
-    else if (!/^\S+@\S+\.\S+$/.test(form.email)) errs.email = "Enter a valid email";
+    else if (!/^\S+@\S+\.\S+$/.test(form.email))
+      errs.email = "Enter a valid email";
     if (!form.password.trim()) errs.password = "Password is required";
-    else if (form.password.length < 6) errs.password = "Use at least 6 characters";
+    else if (form.password.length < 6)
+      errs.password = "Use at least 6 characters";
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
 
-    signup(form.name, form.email, role);
-    pushToast(`Account created — welcome to Nexura, ${role === "admin" ? "Coordinator" : "member"}!`);
-    navigate(role === "admin" ? "/admin/dashboard" : "/student/dashboard");
+    try {
+      const data = await signup(form.name, form.email, form.password, role);
+      pushToast(
+        `Account created — welcome to Nexura, ${isCoordinatorRole(role) ? "Coordinator" : "member"}!`,
+      );
+      if (data?.user) {
+        navigate(
+          isCoordinatorRole(role)
+            ? "/coordinator/dashboard"
+            : "/student/dashboard",
+        );
+      }
+    } catch (error) {
+      setErrors({ form: error.message || "Signup failed" });
+      pushToast(error.message || "Signup failed", "danger");
+    }
   };
 
   return (
@@ -35,13 +60,21 @@ export default function Signup() {
           <div className="w-9 h-9 rounded-lg bg-cta-gradient flex items-center justify-center shadow-glow-purple">
             <Zap className="w-5 h-5 text-white" fill="white" />
           </div>
-          <span className="font-display font-extrabold text-lg tracking-wide text-white">NEXURA</span>
+          <span className="font-display font-extrabold text-lg tracking-wide text-white">
+            NEXURA
+          </span>
         </Link>
 
         <div className="glass-panel rounded-2xl p-5 sm:p-8">
-          <h1 className="font-display text-2xl font-bold text-white text-center">Join Nexura</h1>
+          <h1 className="font-display text-2xl font-bold text-white text-center">
+            Join Nexura
+          </h1>
           <p className="text-sm text-nexura-300 text-center mt-1.5">
-            Create your {role === "admin" ? "coordinator" : "member"} account to {role === "admin" ? "start managing tasks" : "start receiving tasks"}
+            Create your {role === "coordinator" ? "coordinator" : "member"}{" "}
+            account to{" "}
+            {role === "coordinator"
+              ? "start managing tasks"
+              : "start receiving tasks"}
           </p>
 
           <div className="grid grid-cols-2 gap-2 mt-6 p-1 rounded-xl bg-white/5 border border-white/10">
@@ -49,16 +82,20 @@ export default function Signup() {
               type="button"
               onClick={() => setRole("student")}
               className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all ${
-                role === "student" ? "bg-white text-nexura-700 shadow" : "text-nexura-200 hover:text-white"
+                role === "student"
+                  ? "bg-white text-nexura-700 shadow"
+                  : "text-nexura-200 hover:text-white"
               }`}
             >
               <GraduationCap className="w-4 h-4" /> Student
             </button>
             <button
               type="button"
-              onClick={() => setRole("admin")}
+              onClick={() => setRole("coordinator")}
               className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all ${
-                role === "admin" ? "bg-white text-nexura-700 shadow" : "text-nexura-200 hover:text-white"
+                role === "coordinator"
+                  ? "bg-white text-nexura-700 shadow"
+                  : "text-nexura-200 hover:text-white"
               }`}
             >
               <ShieldCheck className="w-4 h-4" /> Coordinator
@@ -67,7 +104,9 @@ export default function Signup() {
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-nexura-200 mb-1.5">Full name</label>
+              <label className="block text-sm font-medium text-nexura-200 mb-1.5">
+                Full name
+              </label>
               <div className="relative">
                 <UserIcon className="w-4 h-4 text-nexura-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
@@ -77,10 +116,14 @@ export default function Signup() {
                   className="w-full rounded-lg bg-white/5 border border-white/15 pl-10 pr-3.5 py-2.5 text-sm text-white placeholder:text-nexura-400 focus:border-nexura-300 focus:ring-2 focus:ring-nexura-400/20 outline-none transition-all"
                 />
               </div>
-              {errors.name && <p className="text-xs text-red-400 mt-1">{errors.name}</p>}
+              {errors.name && (
+                <p className="text-xs text-red-400 mt-1">{errors.name}</p>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-nexura-200 mb-1.5">Email</label>
+              <label className="block text-sm font-medium text-nexura-200 mb-1.5">
+                Email
+              </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-nexura-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
@@ -91,10 +134,14 @@ export default function Signup() {
                   className="w-full rounded-lg bg-white/5 border border-white/15 pl-10 pr-3.5 py-2.5 text-sm text-white placeholder:text-nexura-400 focus:border-nexura-300 focus:ring-2 focus:ring-nexura-400/20 outline-none transition-all"
                 />
               </div>
-              {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-xs text-red-400 mt-1">{errors.email}</p>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-nexura-200 mb-1.5">Password</label>
+              <label className="block text-sm font-medium text-nexura-200 mb-1.5">
+                Password
+              </label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-nexura-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
@@ -105,17 +152,26 @@ export default function Signup() {
                   className="w-full rounded-lg bg-white/5 border border-white/15 pl-10 pr-3.5 py-2.5 text-sm text-white placeholder:text-nexura-400 focus:border-nexura-300 focus:ring-2 focus:ring-nexura-400/20 outline-none transition-all"
                 />
               </div>
-              {errors.password && <p className="text-xs text-red-400 mt-1">{errors.password}</p>}
+              {errors.password && (
+                <p className="text-xs text-red-400 mt-1">{errors.password}</p>
+              )}
+              {errors.form && (
+                <p className="text-xs text-red-400 mt-1">{errors.form}</p>
+              )}
             </div>
 
             <button type="submit" className="btn-primary w-full py-3 mt-2">
-              Create {role === "admin" ? "coordinator" : "member"} account <ArrowRight className="w-4 h-4" />
+              Create {role === "coordinator" ? "coordinator" : "member"} account{" "}
+              <ArrowRight className="w-4 h-4" />
             </button>
           </form>
 
           <p className="text-center text-sm text-nexura-300 mt-6">
             Already have an account?{" "}
-            <Link to="/login" className="text-white font-semibold hover:underline">
+            <Link
+              to="/login"
+              className="text-white font-semibold hover:underline"
+            >
               Log in
             </Link>
           </p>

@@ -251,11 +251,11 @@ export const NOTIFICATIONS_STUDENT = [
 ];
 
 export const NOTIFICATIONS_ADMIN = [
-  { id: "an1", type: "pending", title: "New submission", message: "Aarav Mehta submitted 'Implement a REST API for a Task Tracker'.", time: "2026-08-20T10:15:00", read: false, link: "/admin/submissions/sub1" },
-  { id: "an2", type: "pending", title: "New submission", message: "Ananya Sharma submitted 'Build a Responsive Portfolio Landing Page'.", time: "2026-08-22T20:10:00", read: false, link: "/admin/submissions/sub8" },
-  { id: "an3", type: "pending", title: "New submission", message: "Diya Kapoor submitted 'Git & GitHub Workflow Challenge'.", time: "2026-08-21T16:45:00", read: false, link: "/admin/submissions/sub5" },
-  { id: "an4", type: "task", title: "Task deadline soon", message: "'Git & GitHub Workflow Challenge' deadline is approaching with 2 students yet to submit.", time: "2026-08-16T09:00:00", read: true, link: "/admin/tasks" },
-  { id: "an5", type: "info", title: "New member joined", message: "Kabir Singh joined Nexura and was added to the roster.", time: "2026-01-10T09:00:00", read: true, link: "/admin/students" },
+  { id: "an1", type: "pending", title: "New submission", message: "Aarav Mehta submitted 'Implement a REST API for a Task Tracker'.", time: "2026-08-20T10:15:00", read: false, link: "/coordinator/submissions/sub1" },
+  { id: "an2", type: "pending", title: "New submission", message: "Ananya Sharma submitted 'Build a Responsive Portfolio Landing Page'.", time: "2026-08-22T20:10:00", read: false, link: "/coordinator/submissions/sub8" },
+  { id: "an3", type: "pending", title: "New submission", message: "Diya Kapoor submitted 'Git & GitHub Workflow Challenge'.", time: "2026-08-21T16:45:00", read: false, link: "/coordinator/submissions/sub5" },
+  { id: "an4", type: "task", title: "Task deadline soon", message: "'Git & GitHub Workflow Challenge' deadline is approaching with 2 students yet to submit.", time: "2026-08-16T09:00:00", read: true, link: "/coordinator/tasks" },
+  { id: "an5", type: "info", title: "New member joined", message: "Kabir Singh joined Nexura and was added to the roster.", time: "2026-01-10T09:00:00", read: true, link: "/coordinator/students" },
 ];
 
 export const CATEGORIES = ["Web Development", "Backend Development", "Design", "Tools", "DSA"];

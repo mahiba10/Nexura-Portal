@@ -15,12 +15,15 @@ export default function CreateTask() {
   const [difficulty, setDifficulty] = useState(DIFFICULTIES[1]);
   const [points, setPoints] = useState(100);
   const [deadline, setDeadline] = useState("");
+  const [requirements, setRequirements] = useState(["", ""]);
   const [assignedTo, setAssignedTo] = useState(() => students.map((s) => s.id));
   const [errors, setErrors] = useState({});
 
   React.useEffect(() => {
     if (students && students.length > 0) {
-      setAssignedTo((prev) => (prev.length === 0 ? students.map((s) => s.id) : prev));
+      setAssignedTo((prev) =>
+        prev.length === 0 ? students.map((s) => s.id) : prev,
+      );
     }
   }, [students]);
 
@@ -28,14 +31,19 @@ export default function CreateTask() {
     setRequirements((prev) => prev.map((r, idx) => (idx === i ? value : r)));
   };
   const addRequirement = () => setRequirements((prev) => [...prev, ""]);
-  const removeRequirement = (i) => setRequirements((prev) => prev.filter((_, idx) => idx !== i));
+  const removeRequirement = (i) =>
+    setRequirements((prev) => prev.filter((_, idx) => idx !== i));
 
   const toggleStudent = (id) => {
-    setAssignedTo((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    setAssignedTo((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
   };
 
   const toggleAll = () => {
-    setAssignedTo((prev) => (prev.length === students.length ? [] : students.map((s) => s.id)));
+    setAssignedTo((prev) =>
+      prev.length === students.length ? [] : students.map((s) => s.id),
+    );
   };
 
   const validate = () => {
@@ -43,7 +51,8 @@ export default function CreateTask() {
     if (!title.trim()) errs.title = "Title is required";
     if (!description.trim()) errs.description = "Description is required";
     if (!deadline) errs.deadline = "Deadline is required";
-    if (assignedTo.length === 0) errs.assignedTo = "Assign at least one student";
+    if (assignedTo.length === 0)
+      errs.assignedTo = "Assign at least one student";
     const reqs = requirements.filter((r) => r.trim());
     if (reqs.length === 0) errs.requirements = "Add at least one requirement";
     return errs;
@@ -79,15 +88,25 @@ export default function CreateTask() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <Link to="/coordinator/tasks" className="inline-flex items-center gap-1.5 text-sm font-medium text-nexura-300 hover:text-nexura-200">
+      <Link
+        to="/coordinator/tasks"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-nexura-300 hover:text-nexura-200"
+      >
         <ArrowLeft className="w-4 h-4" /> Back to Manage Tasks
       </Link>
 
       <form onSubmit={handleSubmit} className="card p-6 sm:p-7 space-y-5">
         <div>
           <label className="label-text">Task title</label>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Build a Responsive Portfolio Landing Page" className="input-field" />
-          {errors.title && <p className="text-xs text-red-400 mt-1">{errors.title}</p>}
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="e.g. Build a Responsive Portfolio Landing Page"
+            className="input-field"
+          />
+          {errors.title && (
+            <p className="text-xs text-red-400 mt-1">{errors.title}</p>
+          )}
         </div>
 
         <div className="grid sm:grid-cols-3 gap-4">
@@ -100,26 +119,55 @@ export default function CreateTask() {
           </div>
           <div>
             <label className="label-text">Difficulty</label>
-            <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)} className="input-field">
-              {DIFFICULTIES.map((d) => <option key={d} value={d}>{d}</option>)}
+            <select
+              value={difficulty}
+              onChange={(e) => setDifficulty(e.target.value)}
+              className="input-field"
+            >
+              {DIFFICULTIES.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
             </select>
           </div>
           <div>
             <label className="label-text">Points</label>
-            <input type="number" min={0} value={points} onChange={(e) => setPoints(e.target.value)} className="input-field" />
+            <input
+              type="number"
+              min={0}
+              value={points}
+              onChange={(e) => setPoints(e.target.value)}
+              className="input-field"
+            />
           </div>
         </div>
 
         <div>
           <label className="label-text">Description</label>
-          <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} placeholder="Describe the task in detail..." className="input-field resize-none" />
-          {errors.description && <p className="text-xs text-red-400 mt-1">{errors.description}</p>}
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={4}
+            placeholder="Describe the task in detail..."
+            className="input-field resize-none"
+          />
+          {errors.description && (
+            <p className="text-xs text-red-400 mt-1">{errors.description}</p>
+          )}
         </div>
 
         <div>
           <label className="label-text">Deadline</label>
-          <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className="input-field" />
-          {errors.deadline && <p className="text-xs text-red-400 mt-1">{errors.deadline}</p>}
+          <input
+            type="date"
+            value={deadline}
+            onChange={(e) => setDeadline(e.target.value)}
+            className="input-field"
+          />
+          {errors.deadline && (
+            <p className="text-xs text-red-400 mt-1">{errors.deadline}</p>
+          )}
         </div>
 
         <div>
@@ -134,30 +182,56 @@ export default function CreateTask() {
                   className="input-field"
                 />
                 {requirements.length > 1 && (
-                  <button type="button" onClick={() => removeRequirement(i)} className="w-9 h-9 rounded-lg flex items-center justify-center text-slate hover:bg-red-500/10 hover:text-red-400 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => removeRequirement(i)}
+                    className="w-9 h-9 rounded-lg flex items-center justify-center text-slate hover:bg-red-500/10 hover:text-red-400 shrink-0"
+                  >
                     <X className="w-4 h-4" />
                   </button>
                 )}
               </div>
             ))}
           </div>
-          <button type="button" onClick={addRequirement} className="btn-ghost text-sm mt-2.5 bg-white/5">
+          <button
+            type="button"
+            onClick={addRequirement}
+            className="btn-ghost text-sm mt-2.5 bg-white/5"
+          >
             <Plus className="w-4 h-4" /> Add requirement
           </button>
-          {errors.requirements && <p className="text-xs text-red-400 mt-1">{errors.requirements}</p>}
+          {errors.requirements && (
+            <p className="text-xs text-red-400 mt-1">{errors.requirements}</p>
+          )}
         </div>
 
         <div>
           <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
-            <label className="label-text flex items-center gap-2 mb-0"><Users className="w-4 h-4 text-nexura-400" /> Assign to students</label>
-            <button type="button" onClick={toggleAll} className="text-xs font-semibold text-nexura-300 hover:text-nexura-200">
-              {assignedTo.length === students.length ? "Deselect all" : "Select all"}
+            <label className="label-text flex items-center gap-2 mb-0">
+              <Users className="w-4 h-4 text-nexura-400" /> Assign to students
+            </label>
+            <button
+              type="button"
+              onClick={toggleAll}
+              className="text-xs font-semibold text-nexura-300 hover:text-nexura-200"
+            >
+              {assignedTo.length === students.length
+                ? "Deselect all"
+                : "Select all"}
             </button>
           </div>
           <div className="border border-white/10 rounded-xl divide-y divide-white/5 max-h-64 overflow-y-auto">
             {students.map((s) => (
-              <label key={s.id} className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-white/5 transition-colors">
-                <input type="checkbox" checked={assignedTo.includes(s.id)} onChange={() => toggleStudent(s.id)} className="w-4 h-4 rounded accent-nexura-500" />
+              <label
+                key={s.id}
+                className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-white/5 transition-colors"
+              >
+                <input
+                  type="checkbox"
+                  checked={assignedTo.includes(s.id)}
+                  onChange={() => toggleStudent(s.id)}
+                  className="w-4 h-4 rounded accent-nexura-500"
+                />
                 <div
                   className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold shrink-0"
                   style={{ backgroundColor: s.avatarColor }}
@@ -165,19 +239,39 @@ export default function CreateTask() {
                   {s.name.charAt(0)}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-white truncate">{s.name}</p>
-                  <p className="text-xs text-slate truncate">{s.rollNo} · {s.branch}</p>
+                  <p className="text-sm font-medium text-white truncate">
+                    {s.name}
+                  </p>
+                  <p className="text-xs text-slate truncate">
+                    {s.rollNo} · {s.branch}
+                  </p>
                 </div>
               </label>
             ))}
           </div>
-          {errors.assignedTo && <p className="text-xs text-red-400 mt-1">{errors.assignedTo}</p>}
+          {errors.assignedTo && (
+            <p className="text-xs text-red-400 mt-1">{errors.assignedTo}</p>
+          )}
         </div>
 
-        {errors.form && <p className="text-sm text-red-400 bg-red-500/10 rounded-lg px-3.5 py-2.5">{errors.form}</p>}
+        {errors.form && (
+          <p className="text-sm text-red-400 bg-red-500/10 rounded-lg px-3.5 py-2.5">
+            {errors.form}
+          </p>
+        )}
 
-        <button type="submit" disabled={submitting} className="btn-primary w-full py-3">
-          {submitting ? "Creating Task..." : <>Create & Assign Task <Send className="w-4 h-4" /></>}
+        <button
+          type="submit"
+          disabled={submitting}
+          className="btn-primary w-full py-3"
+        >
+          {submitting ? (
+            "Creating Task..."
+          ) : (
+            <>
+              Create & Assign Task <Send className="w-4 h-4" />
+            </>
+          )}
         </button>
       </form>
     </div>

@@ -13,6 +13,10 @@ create table if not exists public.tasks (
   id uuid primary key default gen_random_uuid(),
   title text not null,
   description text not null default '',
+  category text not null default 'General',
+  difficulty text not null default 'Medium',
+  requirements text[] not null default '{}',
+  assigned_to uuid[] not null default '{}',
   deadline timestamptz not null check (deadline > now()),
   points integer not null default 10 check (points >= 0),
   created_at timestamptz not null default now()
@@ -23,8 +27,15 @@ create table if not exists public.submissions (
   student_id uuid not null references public.profiles(id) on delete cascade,
   task_id uuid not null references public.tasks(id) on delete cascade,
   file_url text,
+  github_url text,
+  live_url text,
+  notes text,
+  feedback text,
   status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
+  attempt integer not null default 1,
+  reviewed_at timestamptz,
   created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
   unique(student_id, task_id)
 );
 
@@ -124,6 +135,16 @@ begin
 end;
 $$;
 
+create or replace function public.set_submissions_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
 -- 4. Create Automation Triggers
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
@@ -139,6 +160,12 @@ drop trigger if exists trg_submissions_guard on public.submissions;
 create trigger trg_submissions_guard
 before insert or update on public.submissions
 for each row execute function public.prevent_submission_ownership_changes();
+
+drop trigger if exists trg_submissions_set_updated_at on public.submissions;
+create trigger trg_submissions_set_updated_at
+before update on public.submissions
+for each row
+execute function public.set_submissions_updated_at();
 
 -- 5. Row Level Security Configuration
 alter table public.profiles enable row level security;
@@ -202,8 +229,10 @@ for delete using (auth.uid() = student_id or public.is_admin());
 -- 6. Performance Indexes
 create index if not exists idx_profiles_role on public.profiles(role);
 create index if not exists idx_tasks_deadline on public.tasks(deadline);
+create index if not exists idx_tasks_category on public.tasks(category);
 create index if not exists idx_submissions_student_task on public.submissions(student_id, task_id);
 create index if not exists idx_submissions_status on public.submissions(status);
+create index if not exists idx_submissions_created_at on public.submissions(created_at);
 
 -- 7. App Access Permissions
 grant usage on schema public to anon, authenticated;

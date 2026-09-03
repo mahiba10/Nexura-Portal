@@ -59,10 +59,16 @@ export async function createTask(taskData) {
   }
 
   const payload = {
-    title: taskData.title,
-    description: taskData.description || "",
+    title: taskData.title?.trim() || "Untitled Task",
+    description: taskData.description?.trim() || "",
     deadline: deadline.toISOString(),
     points: Number(taskData.points || 10),
+    category: taskData.category || "General",
+    difficulty: taskData.difficulty || "Medium",
+    requirements: Array.isArray(taskData.requirements)
+      ? taskData.requirements
+      : [],
+    assigned_to: Array.isArray(taskData.assignedTo) ? taskData.assignedTo : [],
   };
 
   const { data, error } = await supabase
@@ -72,13 +78,7 @@ export async function createTask(taskData) {
     .single();
 
   if (error) throw error;
-  return {
-    ...data,
-    category: taskData.category || "General",
-    difficulty: taskData.difficulty || "Medium",
-    requirements: taskData.requirements || [],
-    assignedTo: taskData.assignedTo || [],
-  };
+  return data;
 }
 
 export async function submitTask(file, taskId, studentId) {
@@ -102,21 +102,52 @@ export async function submitTask(file, taskId, studentId) {
 
   if (signedUrlError) throw signedUrlError;
 
-  const { data, error } = await supabase
+  // Check if a submission already exists for this student+task pair
+  const { data: existingSubmission, error: checkError } = await supabase
     .from("submissions")
-    .insert([
-      {
-        student_id: studentId,
-        task_id: taskId,
+    .select("id")
+    .eq("student_id", studentId)
+    .eq("task_id", taskId)
+    .maybeSingle();
+
+  if (checkError && checkError.code !== "PGRST116") throw checkError;
+
+  let result;
+
+  if (existingSubmission?.id) {
+    // Update existing submission (resubmission)
+    const { data, error } = await supabase
+      .from("submissions")
+      .update({
         file_url: signedUrlData.signedUrl,
         status: "pending",
-      },
-    ])
-    .select()
-    .single();
+      })
+      .eq("id", existingSubmission.id)
+      .select()
+      .single();
 
-  if (error) throw error;
-  return data;
+    if (error) throw error;
+    result = data;
+  } else {
+    // Insert new submission
+    const { data, error } = await supabase
+      .from("submissions")
+      .insert([
+        {
+          student_id: studentId,
+          task_id: taskId,
+          file_url: signedUrlData.signedUrl,
+          status: "pending",
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) throw error;
+    result = data;
+  }
+
+  return result;
 }
 
 export async function fetchLeaderboard() {

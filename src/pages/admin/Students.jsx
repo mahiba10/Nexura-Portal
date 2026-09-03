@@ -51,9 +51,13 @@ export default function Students() {
       try {
         const [studentResult, taskResult, submissionResult] = await Promise.all(
           [
-            supabase.from("students").select("*").order("joined_at", {
-              ascending: false,
-            }),
+            supabase
+              .from("profiles")
+              .select("*")
+              .eq("role", "student")
+              .order("created_at", {
+                ascending: false,
+              }),
             supabase.from("tasks").select("*").order("created_at", {
               ascending: false,
             }),

@@ -1,17 +1,85 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Users, ListChecks, Clock, CheckCircle2, XCircle, PlusSquare, ArrowRight } from "lucide-react";
+import {
+  Users,
+  ListChecks,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  PlusSquare,
+  ArrowRight,
+} from "lucide-react";
 import { useApp } from "../../context/AppContext";
+import supabase from "../../supabaseClient";
 import StatCard from "../../components/StatCard";
 import SubmissionTable from "../../components/SubmissionTable";
 import EmptyState from "../../components/EmptyState";
 import { Inbox } from "lucide-react";
 
 export default function Dashboard() {
-  const { auth, students, tasks, submissions } = useApp();
+  const { auth } = useApp();
+  const [students, setStudents] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [submissions, setSubmissions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+
+    const fetchData = async () => {
+      try {
+        const [studentResult, taskResult, submissionResult] = await Promise.all(
+          [
+            supabase
+              .from("profiles")
+              .select("*")
+              .eq("role", "student")
+              .order("created_at", { ascending: false }),
+            supabase
+              .from("tasks")
+              .select("*")
+              .order("created_at", { ascending: false }),
+            supabase
+              .from("submissions")
+              .select("*")
+              .order("created_at", { ascending: false }),
+          ],
+        );
+
+        if (!active) return;
+
+        if (studentResult.error) throw studentResult.error;
+        if (taskResult.error) throw taskResult.error;
+        if (submissionResult.error) throw submissionResult.error;
+
+        setStudents(studentResult.data || []);
+        setTasks(taskResult.data || []);
+        setSubmissions(submissionResult.data || []);
+      } catch (error) {
+        console.error("Failed to fetch dashboard data:", error);
+        setStudents([]);
+        setTasks([]);
+        setSubmissions([]);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const counts = useMemo(() => {
-    const c = { totalStudents: students.length, totalTasks: tasks.length, pending: 0, approved: 0, rejected: 0 };
+    const c = {
+      totalStudents: students.length,
+      totalTasks: tasks.length,
+      pending: 0,
+      approved: 0,
+      rejected: 0,
+    };
     submissions.forEach((s) => {
       if (s.status === "pending") c.pending++;
       else if (s.status === "approved") c.approved++;
@@ -21,42 +89,95 @@ export default function Dashboard() {
   }, [students, tasks, submissions]);
 
   const recentSubs = useMemo(
-    () => [...submissions].sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt)).slice(0, 6),
-    [submissions]
+    () =>
+      [...submissions]
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, 6),
+    [submissions],
   );
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="card p-6 text-sm text-slate">Loading dashboard…</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl2 bg-nexura-gradient bg-nexura-radial p-6 sm:p-8 text-white relative overflow-hidden">
+      <div className="rounded-xl bg-nexura-gradient p-6 sm:p-8 text-white relative overflow-hidden">
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
           <div>
             <p className="text-nexura-200 text-sm font-medium">Welcome back,</p>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold mt-1">{auth?.user?.name || "Coordinator"} 👋</h2>
-            <p className="text-nexura-200 text-sm mt-2">{counts.pending} submission{counts.pending === 1 ? "" : "s"} waiting for your review.</p>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold mt-1">
+              {auth?.user?.name || "Coordinator"} 👋
+            </h2>
+            <p className="text-nexura-200 text-sm mt-2">
+              {counts.pending} submission{counts.pending === 1 ? "" : "s"}{" "}
+              waiting for your review.
+            </p>
           </div>
-          <Link to="/coordinator/tasks/create" className="btn-primary text-sm shrink-0">
+          <Link
+            to="/coordinator/tasks/create"
+            className="btn-primary text-sm shrink-0"
+          >
             <PlusSquare className="w-4 h-4" /> Create Task
           </Link>
         </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        <StatCard label="Total Students" value={counts.totalStudents} icon={Users} tone="purple" />
-        <StatCard label="Total Tasks" value={counts.totalTasks} icon={ListChecks} tone="purple" />
-        <StatCard label="Pending Reviews" value={counts.pending} icon={Clock} tone="warning" />
-        <StatCard label="Approved" value={counts.approved} icon={CheckCircle2} tone="success" />
-        <StatCard label="Rejected" value={counts.rejected} icon={XCircle} tone="danger" />
+        <StatCard
+          label="Total Students"
+          value={counts.totalStudents}
+          icon={Users}
+          tone="purple"
+        />
+        <StatCard
+          label="Total Tasks"
+          value={counts.totalTasks}
+          icon={ListChecks}
+          tone="purple"
+        />
+        <StatCard
+          label="Pending Reviews"
+          value={counts.pending}
+          icon={Clock}
+          tone="warning"
+        />
+        <StatCard
+          label="Approved"
+          value={counts.approved}
+          icon={CheckCircle2}
+          tone="success"
+        />
+        <StatCard
+          label="Rejected"
+          value={counts.rejected}
+          icon={XCircle}
+          tone="danger"
+        />
       </div>
 
       <div className="card p-6">
         <div className="flex items-center justify-between mb-5">
-          <h3 className="font-display font-semibold text-white">Recent Submissions</h3>
-          <Link to="/coordinator/submissions" className="text-sm font-medium text-nexura-300 hover:text-nexura-200 inline-flex items-center gap-1">
+          <h3 className="font-display font-semibold text-white">
+            Recent Submissions
+          </h3>
+          <Link
+            to="/coordinator/submissions"
+            className="text-sm font-medium text-nexura-300 hover:text-nexura-200 inline-flex items-center gap-1"
+          >
             View all <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
         {recentSubs.length === 0 ? (
-          <EmptyState icon={Inbox} title="No submissions yet" message="Submissions will appear here once students start submitting work." />
+          <EmptyState
+            icon={Inbox}
+            title="No submissions yet"
+            message="Submissions will appear here once students start submitting work."
+          />
         ) : (
           <SubmissionTable submissions={recentSubs} />
         )}

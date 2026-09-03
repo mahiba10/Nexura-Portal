@@ -1,22 +1,86 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, PlusSquare, ListChecks, CalendarDays, Users, Trash2, Pencil } from "lucide-react";
+import {
+  Search,
+  PlusSquare,
+  ListChecks,
+  CalendarDays,
+  Users,
+  Trash2,
+} from "lucide-react";
 import { useApp } from "../../context/AppContext";
+import supabase from "../../supabaseClient";
 import EmptyState from "../../components/EmptyState";
 import ConfirmDialog from "../../components/ConfirmDialog";
-import { formatDate } from "../../data/mockData";
+
+const formatDate = (value) => {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
 
 export default function ManageTasks() {
-  const { tasks, submissions, deleteTask } = useApp();
+  const { deleteTask } = useApp();
+  const [tasks, setTasks] = useState([]);
+  const [submissions, setSubmissions] = useState([]);
   const [query, setQuery] = useState("");
   const [taskToDelete, setTaskToDelete] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+
+    const fetchData = async () => {
+      try {
+        const [taskResult, submissionResult] = await Promise.all([
+          supabase
+            .from("tasks")
+            .select("*")
+            .order("created_at", { ascending: false }),
+          supabase
+            .from("submissions")
+            .select("*")
+            .order("created_at", { ascending: false }),
+        ]);
+
+        if (!active) return;
+
+        if (taskResult.error) throw taskResult.error;
+        if (submissionResult.error) throw submissionResult.error;
+
+        setTasks(taskResult.data || []);
+        setSubmissions(submissionResult.data || []);
+      } catch (error) {
+        console.error("Failed to fetch tasks data:", error);
+        setTasks([]);
+        setSubmissions([]);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const filtered = useMemo(
-    () => tasks.filter((t) => t.title.toLowerCase().includes(query.toLowerCase())).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
-    [tasks, query]
+    () =>
+      tasks
+        .filter((t) => t.title.toLowerCase().includes(query.toLowerCase()))
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)),
+    [tasks, query],
   );
 
-  const submissionCount = (taskId) => submissions.filter((s) => s.taskId === taskId).length;
+  const submissionCount = (taskId) =>
+    submissions.filter((s) => s.task_id === taskId).length;
 
   return (
     <div className="space-y-6">
@@ -35,26 +99,52 @@ export default function ManageTasks() {
         </Link>
       </div>
 
-      {filtered.length === 0 ? (
+      {loading ? (
+        <div className="card p-6 text-sm text-slate">Loading tasks…</div>
+      ) : filtered.length === 0 ? (
         <div className="card">
-          <EmptyState icon={ListChecks} title="No tasks found" message="Create your first task to get started." />
+          <EmptyState
+            icon={ListChecks}
+            title="No tasks found"
+            message="Create your first task to get started."
+          />
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
           {filtered.map((task) => (
             <div key={task.id} className="card p-5 flex flex-col gap-3.5">
               <div>
-                <p className="text-xs font-semibold text-nexura-400 mb-1">{task.category}</p>
-                <h3 className="font-display font-semibold text-white leading-snug">{task.title}</h3>
+                <p className="text-xs font-semibold text-nexura-400 mb-1">
+                  {task.category || "General"}
+                </p>
+                <h3 className="font-display font-semibold text-white leading-snug">
+                  {task.title}
+                </h3>
               </div>
-              <p className="text-sm text-slate line-clamp-2">{task.description}</p>
+              <p className="text-sm text-slate line-clamp-2">
+                {task.description}
+              </p>
               <div className="flex items-center flex-wrap gap-x-4 gap-y-2 text-xs text-slate">
-                <span className="inline-flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5" /> Due {formatDate(task.deadline)}</span>
-                <span className="inline-flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> {task.assignedTo?.length || 0} assigned</span>
-                <span className="text-nexura-300 font-medium">{submissionCount(task.id)} submitted</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <CalendarDays className="w-3.5 h-3.5" /> Due{" "}
+                  {formatDate(task.deadline)}
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Users className="w-3.5 h-3.5" />{" "}
+                  {Array.isArray(task.assigned_to)
+                    ? task.assigned_to.length
+                    : 0}{" "}
+                  assigned
+                </span>
+                <span className="text-nexura-300 font-medium">
+                  {submissionCount(task.id)} submitted
+                </span>
               </div>
               <div className="flex items-center gap-2 pt-2 border-t border-white/5">
-                <Link to={`/coordinator/submissions?task=${task.id}`} className="btn-ghost text-sm flex-1 justify-center bg-white/5">
+                <Link
+                  to={`/coordinator/submissions?task=${task.id}`}
+                  className="btn-ghost text-sm flex-1 justify-center bg-white/5"
+                >
                   View Submissions
                 </Link>
                 <button
@@ -73,7 +163,10 @@ export default function ManageTasks() {
       <ConfirmDialog
         isOpen={!!taskToDelete}
         onClose={() => setTaskToDelete(null)}
-        onConfirm={() => { deleteTask(taskToDelete.id); setTaskToDelete(null); }}
+        onConfirm={() => {
+          deleteTask(taskToDelete.id);
+          setTaskToDelete(null);
+        }}
         title="Remove this task?"
         message={`This will permanently remove "${taskToDelete?.title}" and all of its submissions. This action cannot be undone.`}
         confirmLabel="Remove Task"
